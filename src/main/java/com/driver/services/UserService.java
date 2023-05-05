@@ -25,7 +25,8 @@ public class UserService {
     public Integer addUser(User user){
 
         //Jut simply add the user to the Db and return the userId returned by the repository
-        return null;
+        User saved = userRepository.save(user);
+        return saved.getId();
     }
 
     public Integer getAvailableCountOfWebSeriesViewable(Integer userId){
@@ -34,7 +35,49 @@ public class UserService {
         //Hint: Take out all the Webseries from the WebRepository
 
 
-        return null;
+        User user = userRepository.findById(userId).get();
+        List<WebSeries> webSeriesList = webSeriesRepository.findAll();
+        int count=0;
+
+        for(WebSeries webSeries : webSeriesList)
+        {
+//            if(webSeries.getAgeLimit() <= user.getAge()
+//            && user.getSubscription().getSubscriptionType()==SubscriptionType.ELITE){
+//                count++;
+//               }
+            if(user.getSubscription().getSubscriptionType().equals(SubscriptionType.ELITE)
+                    && (webSeries.getSubscriptionType().equals(SubscriptionType.ELITE)
+                    || webSeries.getSubscriptionType().equals(SubscriptionType.PRO)
+                    || webSeries.getSubscriptionType().equals(SubscriptionType.BASIC))
+                    && user.getAge()>=webSeries.getAgeLimit())
+            {
+                count++;
+            }
+//            else if(webSeries.getAgeLimit() <= user.getAge()
+//            && user.getSubscription().getSubscriptionType()==SubscriptionType.PRO
+//                    && (webSeries.getSubscriptionType()==SubscriptionType.PRO
+//                    || webSeries1.getSubscriptionType()==SubscriptionType.BASIC))
+//                count++;
+            else if(user.getSubscription().getSubscriptionType().equals(SubscriptionType.PRO)
+                    && (webSeries.getSubscriptionType().equals(SubscriptionType.PRO)
+                    || webSeries.getSubscriptionType().equals(SubscriptionType.BASIC))
+                    && user.getAge()>=webSeries.getAgeLimit())
+            {
+                count++;
+            }
+//            else if(webSeries.getAgeLimit() <= user.getAge()
+//                    && user.getSubscription().getSubscriptionType()==SubscriptionType.BASIC
+//                    && webSeries.getSubscriptionType()==SubscriptionType.BASIC)
+//                count++;
+            else if(user.getSubscription().getSubscriptionType().equals(SubscriptionType.BASIC)
+                    && webSeries.getSubscriptionType().equals(SubscriptionType.BASIC)
+                    && user.getAge()>=webSeries.getAgeLimit())
+            {
+                count++;
+            }
+        }
+
+        return count;
     }
 
 
